@@ -38,8 +38,17 @@ document.addEventListener('mousedown', () => {
   firstClicked = true;
   console.log("Mouse button is down");
 });
+document.addEventListener('touchstart', () => {
+  isMouseDown = true;
+  firstClicked = true;
+  console.log("Mouse button is down");
+});
 
 document.addEventListener('mouseup', () => {
+  isMouseDown = false;
+  console.log("Mouse button is up");
+});
+document.addEventListener('touchend', () => {
   isMouseDown = false;
   console.log("Mouse button is up");
 });
