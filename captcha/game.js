@@ -1,19 +1,5 @@
 
 
-
-let isMouseDown = false;
-let firstClicked = false;
-
-document.addEventListener('touchend', () => {
-  isMouseDown = false;
-  console.log("Mouse button is up");
-});
-document.addEventListener('touchstart', () => {
-  isMouseDown = true;
-  firstClicked = true;
-  console.log("Mouse button is down");
-});
-
 // module aliases
 var Engine = Matter.Engine,
     Render = Matter.Render,
@@ -40,7 +26,18 @@ var render = Render.create({
 });
 Render.setSize(render, 390, 300);
 
+let isMouseDown = false;
+let firstClicked = false;
 
+document.addEventListener('touchend', () => {
+  isMouseDown = false;
+  console.log("Mouse button is up");
+});
+document.addEventListener('touchstart', () => {
+  isMouseDown = true;
+  firstClicked = true;
+  console.log("Mouse button is down");
+});
 
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
@@ -107,6 +104,12 @@ Composite.add(world, mouseConstraint);
 render.mouse = mouse;
 
 Matter.Events.on(mouseConstraint, "mousedown", (event) => {
+  if (mouseConstraint.body) {
+    console.log("Clicked body:", mouseConstraint.body);
+  }
+});
+
+Matter.Events.on(mouseConstraint, "touchstart", (event) => {
   if (mouseConstraint.body) {
     console.log("Clicked body:", mouseConstraint.body);
   }
