@@ -1,5 +1,38 @@
 
 
+
+/** Params **/
+
+/**
+* This is the initial Wind Strength.
+* It gets weaker as time goes on.
+*/
+let windStrength = 0.005; // default 0.005
+
+/**
+* This is how much the windStrength gets multiplied with each easier stage.
+*/
+const easierRatio = 0.9; // some other potential values: 0.5
+
+/**
+* This is the time in milliseconds that a single "Difficulty Stage" will last.
+* After this time, the wind will enter the next easier stage.
+*/
+let difficultyTime = 11000; // ms, some other potential values: 45000, 15000
+
+
+/**
+* This is the needed time in seconds to win the captcha.
+* Once the boxes are stacked for this consecutive amount of seconds, it will be a success.
+*/
+const neededTime = 5; // seconds, default 5s
+
+
+
+
+
+
+
 // module aliases
 var Engine = Matter.Engine,
     Render = Matter.Render,
@@ -20,8 +53,7 @@ var render = Render.create({
 	options: {
 		width: 390,
 		height: 300,
-		background: "bg2.png" // Path to your image
-		// or: background: 'lightblue' for a solid color
+		background: "bg2.png"
 	}
 });
 Render.setSize(render, 390, 300);
@@ -31,24 +63,30 @@ let firstClicked = false;
 
 document.addEventListener('touchend', () => {
   isMouseDown = false;
-  console.log("Mouse button is up");
+ // console.log("Mouse button is up");
 });
 document.addEventListener('touchstart', () => {
   isMouseDown = true;
+  if(!firstClicked){
+	  setTimeout(makeEasier, difficultyTime);
+  }
   firstClicked = true;
-  console.log("Mouse button is down");
+ // console.log("Mouse button is down");
 });
 
 document.addEventListener('mousedown', () => {
   isMouseDown = true;
+  if(!firstClicked){
+	  setTimeout(makeEasier, difficultyTime);
+  }
   firstClicked = true;
-  console.log("Mouse button is down");
+ // console.log("Mouse button is down");
 });
 
 
 document.addEventListener('mouseup', () => {
   isMouseDown = false;
-  console.log("Mouse button is up");
+ // console.log("Mouse button is up");
 });
 
 
@@ -103,7 +141,7 @@ Composite.add(world, mouseConstraint);
 // keep the mouse in sync with rendering
 render.mouse = mouse;
 
-Matter.Events.on(mouseConstraint, "mousedown", (event) => {
+/* Matter.Events.on(mouseConstraint, "mousedown", (event) => {
   if (mouseConstraint.body) {
     console.log("Clicked body:", mouseConstraint.body);
   }
@@ -113,10 +151,9 @@ Matter.Events.on(mouseConstraint, "touchstart", (event) => {
   if (mouseConstraint.body) {
     console.log("Clicked body:", mouseConstraint.body);
   }
-});
+}); */
 
 const windBlowing = [0, 0, 0];
-let windStrength = 0.005;
 
 Matter.Events.on(engine, 'beforeUpdate', function(event) {
 	for(let i=0;i < windBlowing.length;i++){
@@ -133,7 +170,7 @@ const getHighestBox = () => {
 	let highest = boxes[0];
 	for(let i=1;i < boxes.length;i++){
 		const box = boxes[i];
-		if(box.position.y > highest.position.y){
+		if(box.position.y < highest.position.y){
 			highest = box;
 		}
 	}
@@ -172,7 +209,6 @@ const checkBoxesStacked = () => {
 };
 
 const logic = () => {
-	// console.log('test');
 	for(let i=0;i < windBlowing.length;i++){
 		// windBlowing[i] = Math.round((Math.random() * 2)) - 1; // -1 to 1
 		windBlowing[i] = Math.round(Math.random()); // 0 to 1
@@ -186,10 +222,9 @@ const logic = () => {
 setInterval(logic, 1000);
 
 const makeEasier = () => {
-	windStrength = windStrength / 2;
-	setTimeout(makeEasier, 45000);
+	windStrength = windStrength * easierRatio;
+	setTimeout(makeEasier, difficultyTime);
 };
-setTimeout(makeEasier, 45000);
 
 let img = new Image();
 img.onload = function() {
@@ -207,7 +242,7 @@ let honeybean = new Image();
 honeybean.onload = function() {
    render.context.drawImage(img, 10, 10);
 };
-honeybean.src = 'honeybean.png';
+honeybean.src = 'hbbb.png';
 
 
 /* Matter.Events.on(render, 'beforeRender', function() {
@@ -215,11 +250,9 @@ honeybean.src = 'honeybean.png';
 });
  */
 let windScroll = -600;
-const neededTime = 5;
 let stackStartTime = 0;
 Matter.Events.on(render, 'afterRender', function() {
      var context = render.context;
-	 
 	 render.context.drawImage(queen, -10, 200, 100, 100);
 	 render.context.drawImage(honeybean, 150, -15, 100, 100);
 	 
@@ -234,8 +267,8 @@ Matter.Events.on(render, 'afterRender', function() {
 		context.fillRect(-10, 90, 400, 100);
 		context.font = "25px Arial";
 		context.fillStyle = 'white';
-		context.fillText("Help the Queen Of Beans", 15, 125);
-		context.fillText("rescue her Honey Bean Baby.", 15, 170);
+		context.fillText("Help the Queen Bean rescue", 15, 125);
+		context.fillText("the Honey Bean Butterfly Baby.", 15, 170);
 	 }
 	 
 	 if(stacked){
@@ -246,7 +279,7 @@ Matter.Events.on(render, 'afterRender', function() {
 		
 		if(remainingTime <= 0){
 			const highestBox = getHighestBox();
-			if(highestBox.position.x+25 > 130 && highestBox.position.x+25 < 260){
+			if(highestBox.position.x+25 > 170 && highestBox.position.x+25 < 280){
 				// Success
 				window.top.postMessage("success", '*');
 			}else{

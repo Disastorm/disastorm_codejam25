@@ -1,3 +1,14 @@
+/**
+*
+*    This is the default matter.js library. 
+*    If you don't want to read through this whole thing to make sure i didn't put anything weird in it,
+*      you can just redownload the matter.js file from their repo: 
+*       https://github.com/liabru/matter-js/tree/master/build
+*
+*/
+
+
+
 /*!
  * matter-js 0.20.0 by @liabru
  * http://brm.io/matter-js/
